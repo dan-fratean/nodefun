@@ -6,7 +6,7 @@
   "author": "Dan Fratean",
   "url": "https://github.com/dan-fratean/nodefun",
   "email": "bugs@nodefun.com",
-  "license": "all rights reserved",
+  "license": "UNLICENSED",
   "scripts": {
     "start": "node server.js"
   },
