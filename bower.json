@@ -1,6 +1,7 @@
 {
-    "name": "nodefun - front",
+    "name": "nodefun-front",
     "version": "1.0.0",
+    "license": "UNLICENSED",
     "dependencies": {
         "bootstrap": "latest",
         "font-awesome": "latest",

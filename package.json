@@ -7,6 +7,9 @@
   "url": "https://github.com/dan-fratean/nodefun",
   "email": "bugs@nodefun.com",
   "license": "all rights reserved",
+  "scripts": {
+    "start": "node server.js"
+  },
   "dependencies" : {
     "express": "*",
     "body-parser" : "*",

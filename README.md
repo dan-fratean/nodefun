@@ -8,13 +8,8 @@ I am app containing simple games developed originally using *jQuery*, but later 
 
 
 **How will I become alive?**
-If not yet installed (or at first run), install *npm-check-updates*: `npm i -g npm-check-updates`
-Afterwards, just:
-```
-npm-check-updates -u
-npm install
-node server.js
-```
+
+If not yet installed || at first run || needs rebuilding, use `server.sh rebuild`. Otherwise, just to run me with `server.sh start`
 
 ----------
 
