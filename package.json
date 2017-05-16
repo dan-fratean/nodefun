@@ -14,5 +14,8 @@
     "express": "*",
     "body-parser" : "*",
     "method-override" : "*"
-  }
+  },
+  "scripts": {
+    "start": "node server.js"
+  }  
 }
