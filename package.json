@@ -1,0 +1,15 @@
+{
+  "name": "nodefun",
+  "version": "0.0.1",
+  "description": "Having fun. Learning. Showing off",
+  "main": "server.js",
+  "author": "Dan Fratean",
+  "url": "https://github.com/dan-fratean/nodefun",
+  "email": "bugs@nodefun.com",
+  "license": "all rights reserved",
+  "dependencies" : {
+    "express": "*",
+    "body-parser" : "*",
+    "method-override" : "*"
+  }
+}
