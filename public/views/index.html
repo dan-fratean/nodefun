@@ -5,6 +5,11 @@
 
         <title>nodefun</title>
 
+        <!-- jQuery and jQueryui load -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+        <!-- angular -->
         <link rel="stylesheet" href="libs/bootstrap/dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="css/style.css">
 
@@ -12,12 +17,23 @@
         <script src="libs/angular-route/angular-route.min.js"></script>
 
         <script src="js/controllers/MainCtrl.js"></script>
-        <script src="js/controllers/GameCtrl.js"></script>
-        <script src="js/services/GamesService.js"></script>
+        <script src="js/controllers/SlidingPuzzleCtrl.js"></script>
+        <script src="js/controllers/MazeCtrl.js"></script>
         <script src="js/appRoutes.js"></script>
         <script src="js/app.js"></script>
+
+        <!-- sliding puzzle -->
+        <link rel="stylesheet" href="assets/css/dpuzzle.css">
+        <script src="assets/js/dpuzzle.js"></script>
+
+        <!-- maze -->
+        <link rel="stylesheet" href="assets/css/dmaze.css">
+        <script src="assets/js/dmaze.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=MedievalSharp">
     </head>
-    <body ng-app="sampleApp" ng-controller="GameController">
+
+
+    <body ng-app="nodeFun" ng-controller="SlidingPuzzleController">
         <div class="container">
 
             <nav class="navbar navbar-inverse">
@@ -26,7 +42,11 @@
                 </div>
 
                 <ul class="nav navbar-nav">
-                    <li><a href="/games">Games</a></li>
+                    <li><a href="/sliding-puzzle">Sliding puzzle</a></li>
+                </ul>
+
+                <ul class="nav navbar-nav">
+                    <li><a href="/maze">Maze</a></li>
                 </ul>
             </nav>
 

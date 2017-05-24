@@ -1,1 +1,1 @@
-angular.module('sampleApp', ['ngRoute', 'appRoutes', 'MainCtrl', 'GameCtrl', 'GameService']);
+angular.module('nodeFun', ['ngRoute', 'appRoutes', 'MainCtrl', 'SlidingPuzzleCtrl', 'MazeCtrl']);

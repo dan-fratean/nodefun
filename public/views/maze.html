@@ -1,0 +1,418 @@
+<div class="jumbotron text-center">
+    <h1>Maze</h1>
+
+    <div class='dmaze_wrapper'></div>
+
+    <h2>Game description</h2>
+        <p>This is Jim Gray. An FBI Agent in the line of duty. This is his assignemnt. Collecting fruits on a medieval maze. Enjoy!</p>
+        <h2>How to play</h2>
+        <p>Use arrow keys to navigate</p>
+        <h2>Woah! I did it (or I got stuck), now what?</h2>
+        <p>Now you can either <span id='dmaze-reload' class='dmaze-reload'>reload</span> the board or visit another game using navigation menu</p>
+</div>
+
+<script>
+/*
+    dmazeGame - a game implmentation using dMaze
+    Copyright (C)2013 Dan Fratean
+    All rights reserved
+*/
+$(document).ready(function () { /* prevent keys */
+    $('#dmaze-reload').click(function() {
+        restart()
+    });
+
+    var ar = new Array(33, 34, 35, 36, 37, 38, 39, 40)
+
+    $(document).keydown(function (e) {
+        var key = e.which
+        if ($.inArray(key, ar) > -1) {
+            e.preventDefault()
+            return false
+        }
+        return true
+    })
+
+    /*
+     * Variables
+     */
+
+    /* maze size */
+    width = 7
+    height = 3
+
+    /* cell flags */
+    enterCell = 128
+    exitCell = 256
+    fruitCell = 512
+
+    /* move command */
+    moveStack = []
+
+    /* the game hast started? */
+    gameStart = 0
+
+    /* did the movign animation finish? */
+    animationFinished = 1
+
+    /* how long animation should last */
+    animationDuration = 600
+
+    /* current cell */
+    currentCell = 0
+
+    /* fruits! */
+    points = 0
+    maxPoints = 0
+
+    /* is the maze finished */
+    allDisabled = 0
+
+    /*
+     * Functions
+     */
+
+    /* drawing the background & the maze */
+    drawMaze = function () {
+
+        $('.dmaze_wrapper').html('<div class="dmaze_background"></div>')
+        $('.dmaze_background').css({
+            'width': (dmaze.settings.maxX * 2 + 1) * 64,
+            'height': (dmaze.settings.maxY * 2 + 1) * 64
+        })
+        div = $('<div class="dmaze_main"></div>').css({
+            'top': '64px',
+            'left': '64px'
+        })
+        $('.dmaze_background').append(div)
+
+        for (var i = 0; i < dmaze.settings.maxX * 2 + 1; i++) {
+            div = $('<div id="b_up' + i + '" class="dmaze_block dmaze_wall"></div>')
+            div.css({
+                'top': '0px',
+                'left': i * 64 + 'px'
+            })
+            $('.dmaze_background').append(div)
+        }
+
+        for (var j = 0; j < dmaze.settings.maxY * 2 + 1; j++) {
+            div = $('<div id="b_left' + i + '" class="dmaze_block dmaze_wall"></div>')
+            div.css({
+                'top': j * 64 + 'px',
+                'left': '0px'
+            })
+            $('.dmaze_background').append(div)
+        }
+
+        for (var i = 0; i < dmaze.settings.maxX; i++) {
+            for (var j = 0; j < dmaze.settings.maxY; j++) {
+                if ((dmaze.maze[i][j] & dmaze.settings.east) == dmaze.settings.east) {
+                    div = $('<div id="b_e' + dmaze.encodeXY(i, j) + '" class="dmaze_block dmaze_wall"></div>')
+                    div.css({
+                        'top': j * 2 * 64 + 64 + 'px',
+                        'left': i * 2 * 64 + 64 + 64 + 'px'
+                    })
+                    $('.dmaze_background').append(div)
+                }
+                if ((dmaze.maze[i][j] & dmaze.settings.south) == dmaze.settings.south) {
+                    div = $('<div id="b_s' + dmaze.encodeXY(i, j) + '" class="dmaze_block dmaze_wall"></div>')
+                    div.css({
+                        'top': j * 2 * 64 + 64 + 64 + 'px',
+                        'left': i * 2 * 64 + 64 + 'px'
+                    })
+                    $('.dmaze_background').append(div)
+                }
+                div = $('<div id="b_se' + dmaze.encodeXY(i, j) + '" class="dmaze_block dmaze_wall"></div>')
+                div.css({
+                    'top': j * 2 * 64 + 64 + 64 + 'px',
+                    'left': i * 2 * 64 + 64 + 64 + 'px'
+                })
+                $('.dmaze_background').append(div)
+
+                div = $('<div id="b_u' + dmaze.encodeXY(i, j) + '" class="dmaze_block"></div>')
+                div.css({
+                    'top': j * 2 * 64 + 64 + 'px',
+                    'left': i * 2 * 64 + 64 + 'px'
+                })
+
+                if ((dmaze.maze[i][j] & fruitCell) == fruitCell) {
+                    div.addClass('dmaze_fruit')
+                	div.css('background-image', 'url("/assets/img/dmaze/fruits/' + Math.floor((Math.random() * 7) + 1) + '.png")')
+                }
+                $('.dmaze_background').append(div)
+            }
+        }
+
+        div = $('<div class="dmaze_title">Jim Grey\'s assignment</div>').css({
+            'top': '0px'
+        })
+        $('.dmaze_background').append(div)
+
+        div = $('<div class="dmaze_score"></div>').css({
+            'top': dmaze.settings.maxY * 2 * 64 + 'px'
+        })
+        $('.dmaze_background').append(div)
+
+        div = $('<div class="§">Press [ X ] to finish the maze</div>').css({
+            'display': 'none'
+        })
+
+        $('.dmaze_background').append(div)
+        div.css({
+            'top': (dmaze.settings.maxY * 64 - div.height() / 2) + 'px',
+            'left': (dmaze.settings.maxX * 64 - div.width() / 2) + 'px'
+        })
+    }
+
+    /* catching movement */
+    $(document).keydown(function (e) {
+        if (e.keyCode == 37)
+            moveStack = [dmaze.settings.west]
+        if (e.keyCode == 38)
+            moveStack = [dmaze.settings.north]
+        if (e.keyCode == 39)
+            moveStack = [dmaze.settings.east]
+        if (e.keyCode == 40)
+            moveStack = [dmaze.settings.south]
+        if (e.keyCode == 82 && allDisabled)
+            restart()
+    })
+
+    /* reseting the maze */
+    restart = function () {
+        /* move command */
+        moveStack = []
+
+        /* the game hast started? */
+        gameStart = 0
+
+        /* did the movign animation finish? */
+        animationFinished = 1
+
+        /* how long animation should last */
+        animationDuration = 600
+
+        /* current cell */
+        currentCell = 0
+
+        /* fruits! */
+        points = 0
+        maxPoints = 0
+
+        /* is the maze finished */
+        allDisabled = 0
+
+        dmaze = new dMaze(width, height)
+        dmaze.generateMaze()
+
+        /* entry point */
+        dmaze.maze[dmaze.decodeX(currentCell)][dmaze.decodeY(currentCell)] += enterCell /* exit point */
+        dmaze.maze[dmaze.settings.maxX - 1][dmaze.settings.maxY - 1] += exitCell
+
+
+        /* adding fruits & drawing the maze*/
+        addfruits()
+        drawMaze()
+
+        /* starting the HB */
+        doHB()
+    }
+
+    /* did we finish the maze? */
+    checkFinish = function () {
+        if (points == maxPoints) {
+          div = $('<div class="dmaze_finish"></div>').html('Congratulations!<br>An apple a day does keep the doctor away!<br>Press [ R ] to play another maze')
+          $('.dmaze_ann').animate({
+              opacity: 'hide'
+          })
+          $('.dmaze_background').append(div)
+          div.css({
+              'top': (dmaze.settings.maxY * 64 - div.height() / 2) + 'px',
+              'left': (dmaze.settings.maxX * 64 - div.width() / 2) + 'px'
+          })
+          div.animate({
+              opacity: 'show'
+          })
+          disableAll()
+        }
+    }
+
+    /* lets stop the engine */
+    disableAll = function () {
+        allDisabled = 1
+        clearTimeout(timeoutHB)
+    },
+
+    /* lets define the hearbeat */
+    doHB = function () {
+        timeoutHB = setTimeout(function () {
+            doHB()
+        }, 10)
+        if (moveStack.length && animationFinished && !this.allDisabled) {
+            tryMove(moveStack[0])
+            if (!gameStart) {
+                var date = new Date()
+                gameStart = date.getTime()
+            }
+        }
+        if (Math.random() * 10 < 1) {
+            var date = new Date()
+            diff = Math.floor((date.getTime() - gameStart) / 1000)
+            if (gameStart) {
+                sec = diff % 60
+                if (sec < 10) sec = '0' + sec
+                min = Math.floor(diff / 60)
+                if (min < 10) min = '0' + min
+                diff = min + ':' + sec
+            } else {
+                diff = '00:00'
+            }
+            $('.dmaze_score').html('<span class="dmaze_time">Time: <span class="white">' + diff + '</span></span><span class="dmaze_fruits"">Fruits: <span class="white">' + points + '/' + maxPoints + '</span></span>')
+        }
+    }
+
+    /* attepmpt to move */
+    tryMove = function (where) {
+        var move = 0
+        if (where == dmaze.settings.east && dmaze.decodeX(currentCell) < dmaze.settings.maxX && (dmaze.maze[dmaze.decodeX(currentCell)][dmaze.decodeY(currentCell)] & where) != where) playerMove(currentCell, currentCell + dmaze.settings.maxY)
+        if (where == dmaze.settings.west && dmaze.decodeX(currentCell) > 0 && (dmaze.maze[dmaze.decodeX(currentCell)][dmaze.decodeY(currentCell)] & where) != where) playerMove(currentCell, currentCell - dmaze.settings.maxY)
+        if (where == dmaze.settings.south && dmaze.decodeY(currentCell) < dmaze.settings.maxY && (dmaze.maze[dmaze.decodeX(currentCell)][dmaze.decodeY(currentCell)] & where) != where) playerMove(currentCell, currentCell + 1)
+        if (where == dmaze.settings.north && dmaze.decodeY(currentCell) > 0 && (dmaze.maze[dmaze.decodeX(currentCell)][dmaze.decodeY(currentCell)] & where) != where) playerMove(currentCell, currentCell - 1)
+    }
+
+    /* move */
+    playerMove = function (a, b) {
+        animationFinished = 0
+        setPlayer(b)
+        animatePlayer(a, b)
+    }
+
+    /* movement animation */
+    animatePlayer = function (a, b) {
+        x = dmaze.decodeX(a)
+        y = dmaze.decodeY(a)
+        xx = dmaze.decodeX(b)
+        yy = dmaze.decodeY(b)
+
+        if (x < xx) {
+            $('.dmaze_main').animate({
+                'left': '+=128px'
+            }, {
+                'easing': 'linear',
+                'duration': animationDuration,
+                'step': function (l, o) {
+                    $('.dmaze_main').css({
+                        'background-position': -1 * Math.floor((o.now - o.start) / Math.floor((o.end - o.start) / 8)) * 64 + 'px -192px' //-27
+                    })
+                },
+                'done': function () {
+                    animationFinish('east')
+                }
+            })
+        }
+        if (x > xx) {
+            $('.dmaze_main').animate({
+                'left': '-=128px'
+            }, {
+                'easing': 'linear',
+                'duration': animationDuration,
+                'step': function (l, o) {
+                    $('.dmaze_main').css({
+                        'background-position': -1 * Math.floor((o.now - o.start) / Math.floor((o.end - o.start) / 8)) * 64 + 'px -64px' //0
+                    })
+                },
+                'done': function () {
+                    animationFinish('west')
+                }
+            })
+        }
+        if (y < yy) {
+            $('.dmaze_main').animate({
+                'top': '+=128px'
+            }, {
+                'easing': 'linear',
+                'duration': animationDuration,
+                'step': function (l, o) {
+                    $('.dmaze_main').css({
+                        'background-position': -1 * Math.floor((o.now - o.start) / Math.floor((o.end - o.start) / 8)) * 64 + 'px 128px' //-81
+                    })
+                },
+                'done': function () {
+                    animationFinish('south')
+                }
+            })
+        }
+        if (y > yy) {
+            $('.dmaze_main').animate({
+                'top': '-=128px'
+            }, {
+                'easing': 'linear',
+                'duration': animationDuration,
+                'step': function (l, o) {
+                    $('.dmaze_main').css({
+                        'background-position': -1 * Math.floor((o.now - o.start) / Math.floor((o.end - o.start) / 8)) * 64 + 'px -0px' //54
+                    })
+                },
+                'done': function () {
+                    animationFinish('north')
+                }
+            })
+        }
+    }
+
+    /* we finished the animation */
+    animationFinish = function (dir) {
+        if ((dmaze.maze[dmaze.decodeX(currentCell)][dmaze.decodeY(currentCell)] & fruitCell) == fruitCell) {
+            dmaze.maze[dmaze.decodeX(currentCell)][dmaze.decodeY(currentCell)] -= fruitCell
+            points++
+        }
+
+        curr = $('#b_u' + currentCell)
+        curr.removeClass('dmaze_fruit')
+        curr.css('background-image', '')
+        animationFinished = 1
+
+        checkFinish()
+    }
+
+    /* set the player cell */
+    setPlayer = function (c) {
+        currentCell = c
+    }
+
+    addfruits = function () {
+        $.each(dmaze.maze, function (i, row) {
+            $.each(row, function (j, cell) {
+                var wall = 0
+                if ((cell & dmaze.settings.east) == dmaze.settings.east) wall++
+                if ((cell & dmaze.settings.west) == dmaze.settings.west) wall++
+                if ((cell & dmaze.settings.south) == dmaze.settings.south) wall++
+                if ((cell & dmaze.settings.north) == dmaze.settings.north) wall++
+                if (wall == 3 && (i || j)) {
+                    dmaze.maze[i][j] += fruitCell
+                    maxPoints++
+                }
+            })
+        })
+    }
+
+    /*
+     * Let's start!
+     */
+
+    dmaze = new dMaze(width, height)
+    dmaze.generateMaze()
+
+    /* entry point */
+    dmaze.maze[dmaze.decodeX(currentCell)][dmaze.decodeY(currentCell)] += enterCell /* exit point */
+    dmaze.maze[dmaze.settings.maxX - 1][dmaze.settings.maxY - 1] += exitCell
+
+
+    /* adding fruits & drawing the maze*/
+    addfruits()
+    drawMaze()
+
+    /* starting the HB */
+    doHB()
+})
+</script>

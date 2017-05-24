@@ -1,0 +1,97 @@
+@font-face {
+	font-family: 'MedievalSharp', serif;
+    font-size: 48px;
+}
+
+.dmaze_wrapper
+{
+	font-family:MedievalSharp, Arial;
+	overflow:hidden;
+	margin: 0 auto;
+	display: inline-block;
+}
+
+.dmaze_background {
+	background-image:url('/assets/img/dmaze/back.png');
+	position: relative;
+	float:left;
+	z-index:250;
+}
+
+.dmaze_block {
+	z-index: 500;
+	width:64px;
+	height:64px;
+	border:0;
+	padding:0;
+	margin: 0;
+	float:left;
+	position:absolute;
+}
+
+.dmaze_wall {
+	background-image:url('/assets/img/dmaze/wall.png');
+	background-size:64px 64px;
+	width:64px;
+	height:64px;
+}
+
+.dmaze_fruit {
+	background-size:64px 64px;
+	background-position:center;
+	background-repeat: no-repeat;
+}
+
+.dmaze_main {
+	background-image:url('/assets/img/dmaze/FBI_walk_cycle.png');
+	background-size:576px 256px;
+	position:absolute;
+	width:64px;
+	height:64px;
+	border:0;
+	margin-left:0px;
+	margin-top:0px;
+	float:left;
+	z-index:750;
+	background-position: 0px 128px;
+}
+
+.dmaze_score, .dmaze_title {
+	margin-top:10px;
+	z-index:1250;
+	position: absolute;
+	color: LightSalmon;
+	font-size:30px;
+	text-align: center;
+	width: 100%;
+}
+
+.white {
+	color: white
+}
+
+.dmaze_fruits, .dmaze_time {
+	float:left;
+	text-align: left;
+	padding-left:64px;
+	width:100%;
+	font-size:20px;
+}
+
+.dmaze_ann, .dmaze_finish{
+	text-align:center;
+	color: white;
+	background-color: LightSalmon;
+	border:3px solid LightCoral;
+	position: absolute;
+	z-index:1250;
+	padding:20px;
+	box-shadow: 6px 6px 6px 0px #999;
+	width:auto;
+}
+
+.dmaze-reload {
+	background: rgb(85, 107, 47);
+	background: rgba(85, 107, 47, .3);
+	cursor: pointer;
+}

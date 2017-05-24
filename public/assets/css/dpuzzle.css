@@ -1,0 +1,68 @@
+.dpuzzle-wrapper {
+	position: relative;
+	background:white;
+	-moz-border-radiust: 2px;
+        border-radius: 2px;
+    text-align: center;
+}
+
+.dpuzzle-main {
+	position: relative;
+	background:white;
+	display: inline-block;
+}
+
+.dpuzzle-block-common {
+	display: inline-block;
+	margin: 0px;
+	padding: 0px;
+	position: absolute;
+	z-index: 1000;
+	text-align:left;
+}
+
+.dpuzzle-block {
+	border: 1px solid rgba(255, 255, 255, .1);
+	margin: 1px;
+}
+
+.dpuzzle-drag-area {
+	position: absolute;
+	z-index: 700;
+}
+
+.dpuzzle-empty-block {
+}
+
+.dpuzzle-block-numbers {
+	color: rgb(255, 255, 255);
+	display: inline;
+	font-family: "Courier New", Courier, monospace;
+	font-size: 25px;
+	text-align: left;
+	visibility: visible;
+	text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+}
+
+.dpuzzle-no-select
+{
+	user-select: none;
+	-o-user-select: none;
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	-ms-user-select:none;
+}
+
+.dpuzzle-loading {
+}
+
+.dpuzzle-reload {
+	background: rgb(85, 107, 47);
+	background: rgba(85, 107, 47, .3);
+	cursor: pointer;
+}

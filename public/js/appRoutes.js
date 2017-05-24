@@ -7,10 +7,15 @@ angular.module('appRoutes', []).config(['$routeProvider', '$locationProvider', f
             controller: 'MainController'
         })
 
-        .when('/games', {
-            templateUrl: 'views/game.html',
-            controller: 'GameController'
-        });
+        .when('/sliding-puzzle', {
+            templateUrl: 'views/sliding-puzzle.html',
+            controller: 'SlidingPuzzleController'
+        })
+
+        .when('/maze', {
+            templateUrl: 'views/maze.html',
+            controller: 'MazeController'
+        })
 
     $locationProvider.html5Mode(true);
 

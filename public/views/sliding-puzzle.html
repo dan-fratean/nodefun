@@ -1,0 +1,40 @@
+<div class="jumbotron text-center">
+    <h1>Sliding puzzle</h1>
+
+	<div class='puzzle_wrapper'>
+		<div id='dpuzzle-main' class='dpuzzle-main'>
+			<img id='dpuzzle-image-load' class='dpuzzle-image-load' style='display:none' src='assets/img/world.jpg' resize='620' x_blocks='3' y_blocks='3' message='Wooohoo! You did it!'>
+		</div>
+	</div>
+
+    <h2>Game description</h2>
+    <p>A sliding puzzle puzzle that challenges a player to slide pieces along certain routes on a board to establish a certain end-configuration. The pieces to be moved will consist of simple rectagles and will be imprinted with numbers and sections of a larger picture.</p>
+    <h2>How to play</h2>
+    <p>Drag and drop the desired piece in the adjacent empty space.</p>
+    <h2>Woah! I did it (or I got stuck), now what?</h2>
+    <p>Now you can either <span id='dpuzzle-reload' class='dpuzzle-reload'>reload</span> the board or visit another game using navigation menu</p>
+
+</div>
+
+<script>
+$(document).ready(function()
+{
+	var url = $('#dpuzzle-image-load').attr("src") + "?" + Date.now()
+	$('#dpuzzle-image-load').attr("src", url)
+
+	$('#dpuzzle-image-load').on('load', function() {
+	    	dpuzzle = new dPuzzle();
+		dpuzzle.startPuzzle($('#dpuzzle-image-load'), dpuzzle);
+	})
+
+	$('#dpuzzle-fix-me').click(function(event) {
+		dpuzzle.resetDraggableArea();
+		return 0;
+	})
+
+	$('#dpuzzle-reload').click(function() {
+    	dpuzzle = new dPuzzle();
+		dpuzzle.startPuzzle($('#dpuzzle-image-load'), dpuzzle);
+	});
+});
+</script>
