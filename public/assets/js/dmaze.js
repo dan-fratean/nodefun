@@ -3,7 +3,7 @@
     Copyright (C)2013 Dan Fratean
     All rights reserved
 */
-var dMaze = function (x, y) {
+var dMaze = function (x, y, h = 1, v = 1) {
     return {
         settings: {
             maxX: x,
@@ -15,6 +15,8 @@ var dMaze = function (x, y) {
             visitedCell: 16,
             visitedCells: 0,
             currentCell: 0,
+            horizontalPreference: h,
+            verticalPreference: v,
             back: {
                 1: 2,
                 2: 1,
@@ -46,15 +48,22 @@ var dMaze = function (x, y) {
         findNeighbor: function (c) {
             x = this.decodeX(c)
             y = this.decodeY(c)
+            var i
             possibleCells = []
+
             if (x + 1 < this.settings.maxX && !this.visited(this.encodeXY(x + 1, y)))
-                possibleCells.push([this.encodeXY(x + 1, y), this.settings.east])
+                for (i = 0; i < this.settings.horizontalPreference; i++)
+                    possibleCells.push([this.encodeXY(x + 1, y), this.settings.east])
             if (x - 1 >= 0 && !this.visited(this.encodeXY(x - 1, y)))
-                possibleCells.push([this.encodeXY(x - 1, y), this.settings.west])
+                for (i = 0; i < this.settings.horizontalPreference; i++)
+                    possibleCells.push([this.encodeXY(x - 1, y), this.settings.west])
             if (y + 1 < this.settings.maxY && !this.visited(this.encodeXY(x, y + 1)))
-                possibleCells.push([this.encodeXY(x, y + 1), this.settings.south])
+                for (i = 0; i < this.settings.verticalPreference; i++)
+                    possibleCells.push([this.encodeXY(x, y + 1), this.settings.south])
             if (y - 1 >= 0 && !this.visited(this.encodeXY(x, y - 1)))
-                possibleCells.push([this.encodeXY(x, y - 1), this.settings.north])
+                for (i = 0; i < this.settings.verticalPreference; i++)
+                    possibleCells.push([this.encodeXY(x, y - 1), this.settings.north])
+
             if (possibleCells.length) {
                 return possibleCells[Math.floor(Math.random() * possibleCells.length)]
             }
@@ -83,6 +92,33 @@ var dMaze = function (x, y) {
                     this.visit(this.settings.currentCell)
                 } else {
                     this.settings.currentCell = this.stack.pop()
+                }
+            }
+        },
+        braidMaze: function () {
+            for (var i = 0; i < this.settings.maxX; i++) {
+                for (var j = 0; j < this.settings.maxY; j++) {
+                    var wall = 0
+                    var cell = this.maze[i][j]
+                    if ((cell & this.settings.east) == this.settings.east) wall++
+                    if ((cell & this.settings.west) == this.settings.west) wall++
+                    if ((cell & this.settings.south) == this.settings.south) wall++
+                    if ((cell & this.settings.north) == this.settings.north) wall++
+                    if (wall == 3) {
+                        possibleCells = []
+                        if (i + 1 < this.settings.maxX && (cell & this.settings.east) == this.settings.east)
+                            possibleCells.push([this.encodeXY(i + 1, j), this.settings.east])
+                        if (i - 1 >= 0 && (cell & this.settings.west) == this.settings.west)
+                            possibleCells.push([this.encodeXY(i - 1, j), this.settings.west])
+                        if (j + 1 < this.settings.maxY && (cell & this.settings.south) == this.settings.south)
+                            possibleCells.push([this.encodeXY(i, j + 1), this.settings.south])
+                        if (j - 1 >= 0 && (cell & this.settings.north) == this.settings.north)
+                            possibleCells.push([this.encodeXY(i, j - 1), this.settings.north])
+                        if (possibleCells.length) {
+                            neighbor = possibleCells[Math.floor(Math.random() * possibleCells.length)]
+                            this.knockDownWall(this.encodeXY(i, j), neighbor[0], neighbor[1])
+                        }
+                    }
                 }
             }
         },
