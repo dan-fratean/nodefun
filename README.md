@@ -14,5 +14,5 @@ If not yet installed || at first run || needs rebuilding, use `server.sh rebuild
 ----------
 
 **License**
-Copyright (c) 2017-2017 Alexandru-Dan Fratean
+Copyright (c) 2017-now(wherver is now) Alexandru-Dan Fratean
 All rights reserved.
